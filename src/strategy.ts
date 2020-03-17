@@ -2,7 +2,8 @@
   eslint-disable
 
   no-template-curly-in-string,
-  no-multi-assign
+  no-multi-assign,
+  prefer-rest-params
  */
 
 import { Strategy } from 'passport-strategy';
@@ -71,14 +72,18 @@ export class MagicStrategy extends Strategy {
   constructor(verify:  VerifyFuncWithReq,       options: StrategyOptionsWithReq);
   constructor(verify:  VerifyFunc);
   /* eslint-enable prettier/prettier */
-  constructor(...args: any[]) {
+  constructor(
+    arg0: VerifyFunc | VerifyFuncWithReq | StrategyOptions | StrategyOptionsWithReq,
+    arg1?: VerifyFunc | VerifyFuncWithReq | StrategyOptions | StrategyOptionsWithReq,
+  ) {
     super();
 
     // Extract options from arguments -- parameters can be provided in any order.
+    const args = Array.from(arguments);
     const verify = args.find(arg => typeof arg === 'function') as VerifyFunc | VerifyFuncWithReq;
     const options = args.find(arg => typeof arg !== 'function') as StrategyOptions | StrategyOptionsWithReq | undefined;
 
-    if (!verify) throw new TypeError('[MagicStrategy] A `verify` callback is required');
+    if (!verify) throw new TypeError('`MagicStrategy` requires a `verify` callback.');
 
     this.verify = this.verifyWithReq = verify as any;
     this.passReqToCallback = !!options?.passReqToCallback;
@@ -91,13 +96,15 @@ export class MagicStrategy extends Strategy {
    * @param req - A request object from Express.
    */
   public async authenticate(req: Request) {
-    const hasAuthorizationHeader = !!req.headers?.authorization;
-    const didToken = req.headers?.authorization?.toLowerCase()?.split('bearer')[1];
+    const hasAuthorizationHeader = !!req.headers.authorization;
+    const isFormattedCorrectly = req.headers.authorization?.toLowerCase().startsWith('bearer ');
 
     if (!hasAuthorizationHeader) return this.fail({ message: 'Missing authorization header.' }, 400);
-    if (!didToken) {
+    if (!isFormattedCorrectly) {
       return this.fail({ message: 'Malformed authorization header. Please use the `Bearer ${token}` format.' }, 400);
     }
+
+    const didToken = req.headers.authorization!.substring(7);
 
     try {
       await this.magicInstance.token.validate(didToken);
