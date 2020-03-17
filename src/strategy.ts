@@ -1,0 +1,127 @@
+/*
+  eslint-disable
+
+  no-template-curly-in-string,
+  no-multi-assign
+ */
+
+import { Strategy } from 'passport-strategy';
+import { Magic, SDKError as MagicSDKError } from '@magic-sdk/admin';
+import { Request } from 'express';
+import { VerifyFunc, VerifyFuncWithReq, StrategyOptions, StrategyOptionsWithReq, MagicUser, DoneFunc } from './types';
+
+export class MagicStrategy extends Strategy {
+  public readonly name = 'magic';
+  private readonly verify: VerifyFunc;
+  private readonly verifyWithReq: VerifyFuncWithReq;
+  private readonly passReqToCallback: boolean;
+  private readonly magicInstance: Magic;
+
+  /**
+   * Creates an instance of `MagicStrategy`.
+   *
+   * This authentication strategy validates requests based on an authorization
+   * header containing a Decentralized ID Token (DIDT).
+   *
+   * Applications must supply a `verify` callback which accepts a `MagicUser`
+   * object with the following information:
+   *
+   *   1. `claim`: The validated and parsed DIDT claim.
+   *   2. `id`: The user's Decentralized Identfier. This should be used as the
+   *      ID column in your user tables.
+   *   3. `publicAddress`: The public address of the signing user. DIDTs are
+   *      generated using Elliptic Curve public/private key pairs.
+   *
+   * The `verify` callback also supplies a `done` callback, which should be
+   * called with the user's resolved profile information or set to `false` if
+   * the credentials are not valid (i.e.: due to a replay attack).
+   *
+   * If an exception occurred, `err` should be set.
+   *
+   * An `options` object can be passed to the constructor to customize behavior of the `verify` callback:
+   *
+   * Options:
+   *   - `magicInstance`: A custom Magic SDK instance to use.
+   *   - `passReqToCallback`: When `true`, `req` is the first argument to the verify callback (default: `false`).
+   *
+   * **NOTE: Parameters can be provided in any order!**
+   *
+   * @param options - Options to customize the functionality of `verify`.
+   * @param verify - A callback to validate the authentication request.
+   *
+   * @see https://docs.magic.link/tutorials/decentralized-id
+   * @see https://w3c-ccg.github.io/did-primer/
+   *
+   * @example
+   *     passport.use(new MagicStrategy(
+   *       ({ id }, done) => {
+   *         try {
+   *           const user = await User.findOne(id);
+   *           done(null, user);
+   *         } catch (err) {
+   *           done(err);
+   *         }
+   *       }
+   *     ));
+   */
+  /* eslint-disable prettier/prettier */
+  constructor(options: StrategyOptions,         verify:  VerifyFunc);
+  constructor(options: StrategyOptionsWithReq,  verify:  VerifyFuncWithReq);
+  constructor(verify:  VerifyFunc,              options: StrategyOptions);
+  constructor(verify:  VerifyFuncWithReq,       options: StrategyOptionsWithReq);
+  constructor(verify:  VerifyFunc);
+  /* eslint-enable prettier/prettier */
+  constructor(...args: any[]) {
+    super();
+
+    // Extract options from arguments -- parameters can be provided in any order.
+    const verify = args.find(arg => typeof arg === 'function') as VerifyFunc | VerifyFuncWithReq;
+    const options = args.find(arg => typeof arg !== 'function') as StrategyOptions | StrategyOptionsWithReq | undefined;
+
+    if (!verify) throw new TypeError('[MagicStrategy] A `verify` callback is required');
+
+    this.verify = this.verifyWithReq = verify as any;
+    this.passReqToCallback = !!options?.passReqToCallback;
+    this.magicInstance = options?.magicInstance || new Magic('' as any);
+  }
+
+  /**
+   * Authenticate request based on the authorization header.
+   *
+   * @param req - A request object from Express.
+   */
+  public async authenticate(req: Request) {
+    const hasAuthorizationHeader = !!req.headers?.authorization;
+    const didToken = req.headers?.authorization?.toLowerCase()?.split('bearer')[1];
+
+    if (!hasAuthorizationHeader) return this.fail({ message: 'Missing authorization header.' }, 400);
+    if (!didToken) {
+      return this.fail({ message: 'Malformed authorization header. Please use the `Bearer ${token}` format.' }, 400);
+    }
+
+    try {
+      await this.magicInstance.token.validate(didToken);
+      const user: MagicUser = {
+        id: this.magicInstance.token.getIssuer(didToken),
+        publicAddress: this.magicInstance.token.getPublicAddress(didToken),
+        claim: this.magicInstance.token.decode(didToken)[1],
+      };
+
+      const done: DoneFunc = (_err, _user, _info: any) => {
+        if (_err) return this.error(_err);
+        if (!_user) return this.fail(_info);
+        this.success(_user, _info);
+      };
+
+      try {
+        if (this.passReqToCallback) this.verifyWithReq(req, user, done);
+        else this.verify(user, done);
+      } catch (err) {
+        return this.error(err);
+      }
+    } catch (err) {
+      if (err instanceof MagicSDKError) return this.fail({ message: err.message, error_code: err.code }, 401);
+      return this.fail({ message: 'Invalid DID token.' }, 401);
+    }
+  }
+}
