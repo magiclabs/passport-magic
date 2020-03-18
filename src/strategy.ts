@@ -87,7 +87,7 @@ export class MagicStrategy extends Strategy {
 
     this.verify = this.verifyWithReq = verify as any;
     this.passReqToCallback = !!options?.passReqToCallback;
-    this.magicInstance = options?.magicInstance || new Magic('' as any);
+    this.magicInstance = options?.magicInstance || new Magic();
   }
 
   /**
