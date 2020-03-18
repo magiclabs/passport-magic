@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import { MagicStrategy } from '../../src/strategy';
+import { Strategy } from '../../src/strategy';
 
 export function createStrategyInstance(
   options: {
@@ -37,7 +37,7 @@ export function createStrategyInstance(
     );
   });
 
-  const strat = new MagicStrategy(optionsWithDefaults.passReqToCallback ? verifyStubWithReq : verifyStub, {
+  const strat = new Strategy(optionsWithDefaults.passReqToCallback ? verifyStubWithReq : verifyStub, {
     passReqToCallback: optionsWithDefaults.passReqToCallback,
   } as any);
 

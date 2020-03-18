@@ -6,12 +6,12 @@
   prefer-rest-params
  */
 
-import { Strategy } from 'passport-strategy';
+import { Strategy as BaseStrategy } from 'passport-strategy';
 import { Magic, SDKError as MagicSDKError } from '@magic-sdk/admin';
 import { Request } from 'express';
 import { VerifyFunc, VerifyFuncWithReq, StrategyOptions, StrategyOptionsWithReq, MagicUser, DoneFunc } from './types';
 
-export class MagicStrategy extends Strategy {
+export class Strategy extends BaseStrategy {
   public readonly name = 'magic';
   private readonly verify: VerifyFunc;
   private readonly verifyWithReq: VerifyFuncWithReq;
