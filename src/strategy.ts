@@ -16,6 +16,7 @@ export class Strategy extends BaseStrategy {
   private readonly verify: VerifyFunc;
   private readonly verifyWithReq: VerifyFuncWithReq;
   private readonly passReqToCallback: boolean;
+  private readonly attachmentAttribute: string;
   private readonly magicInstance: Magic;
 
   /**
@@ -87,6 +88,7 @@ export class Strategy extends BaseStrategy {
 
     this.verify = this.verifyWithReq = verify as any;
     this.passReqToCallback = !!options?.passReqToCallback;
+    this.attachmentAttribute = options?.attachmentAttribute ?? 'attachment';
     this.magicInstance = options?.magicInstance || new Magic();
   }
 
@@ -105,9 +107,10 @@ export class Strategy extends BaseStrategy {
     }
 
     const didToken = req.headers.authorization!.substring(7);
+    const attachment = (req as any)[this.attachmentAttribute] ?? 'none';
 
     try {
-      await this.magicInstance.token.validate(didToken);
+      this.magicInstance.token.validate(didToken, attachment);
       const user: MagicUser = {
         id: this.magicInstance.token.getIssuer(didToken),
         publicAddress: this.magicInstance.token.getPublicAddress(didToken),
