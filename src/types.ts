@@ -18,7 +18,7 @@ export interface AuthenticateOptions {
 }
 
 export interface MagicUser {
-  id: string;
+  issuer: string;
   publicAddress: string;
   claim: Claim;
 }
