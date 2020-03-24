@@ -112,7 +112,7 @@ export class Strategy extends BaseStrategy {
     try {
       this.magicInstance.token.validate(didToken, attachment);
       const user: MagicUser = {
-        id: this.magicInstance.token.getIssuer(didToken),
+        issuer: this.magicInstance.token.getIssuer(didToken),
         publicAddress: this.magicInstance.token.getPublicAddress(didToken),
         claim: this.magicInstance.token.decode(didToken)[1],
       };
