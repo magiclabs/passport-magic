@@ -3,15 +3,32 @@
 import test from 'ava';
 import sinon from 'sinon';
 import { ErrorCode as MagicSDKErrorCode } from '@magic-sdk/admin';
-import { VALID_DIDT, VALID_DIDT_PARSED_CLAIMS, EXPIRED_DIDT } from '../../lib/constants';
+import {
+  VALID_DIDT,
+  VALID_DIDT_PARSED_CLAIMS,
+  EXPIRED_DIDT,
+  VALID_DIDT_WITH_ATTACHMENT,
+  VALID_DIDT_WITH_ATTACHMENT_PARSED_CLAIMS,
+} from '../../lib/constants';
 import { createStrategyInstance } from '../../lib/factories';
 
 const invalidReq: any = { headers: { authorization: `Bearer ${EXPIRED_DIDT}` } };
+
 const validReq: any = { headers: { authorization: `Bearer ${VALID_DIDT}` } };
 const validUser: any = {
-  id: VALID_DIDT_PARSED_CLAIMS.iss,
+  issuer: VALID_DIDT_PARSED_CLAIMS.iss,
   publicAddress: VALID_DIDT_PARSED_CLAIMS.iss.split(':')[2],
   claim: VALID_DIDT_PARSED_CLAIMS,
+};
+
+const validReqWithAttachment: any = {
+  headers: { authorization: `Bearer ${VALID_DIDT_WITH_ATTACHMENT}` },
+  attachment: 'asdf',
+};
+const validUserWithAttachment: any = {
+  issuer: VALID_DIDT_WITH_ATTACHMENT_PARSED_CLAIMS.iss,
+  publicAddress: VALID_DIDT_WITH_ATTACHMENT_PARSED_CLAIMS.iss.split(':')[2],
+  claim: VALID_DIDT_WITH_ATTACHMENT_PARSED_CLAIMS,
 };
 
 test('#01: Fails with status 400 if authorization header is missing', async t => {
@@ -67,7 +84,16 @@ test('#05: Handles failure case from user-provided verification function', async
   t.true(failStub.calledOnceWith({ message: 'goodbye world' }));
 });
 
-test('#06: Handles error case from user-provided verification function', async t => {
+test('#06: Uses attachment from `req[attachmentAttribute]`', async t => {
+  const { strat, verifyStub, failStub } = createStrategyInstance({ shouldFailVerification: true });
+
+  await strat.authenticate(validReqWithAttachment);
+
+  t.deepEqual(verifyStub.args[0][0], validUserWithAttachment);
+  t.true(failStub.calledOnceWith({ message: 'goodbye world' }));
+});
+
+test('#07: Handles error case from user-provided verification function', async t => {
   const { strat, verifyStub, errorStub } = createStrategyInstance({ shouldErrorVerification: true });
 
   await strat.authenticate(validReq);
@@ -76,7 +102,7 @@ test('#06: Handles error case from user-provided verification function', async t
   t.true(errorStub.calledOnceWith({ message: 'hello world' }));
 });
 
-test('#07: Handles exception while executing user-provided verification function', async t => {
+test('#08: Handles exception while executing user-provided verification function', async t => {
   const { strat, verifyStub, errorStub } = createStrategyInstance({ shouldThrowVerification: true });
 
   await strat.authenticate(validReq);
@@ -85,7 +111,7 @@ test('#07: Handles exception while executing user-provided verification function
   t.is(errorStub.args[0][0].message, 'uh oh!');
 });
 
-test('#08: Handles exceptions from Magic Admin SDK during token validation', async t => {
+test('#09: Handles exceptions from Magic Admin SDK during token validation', async t => {
   const { strat, verifyStub, failStub } = createStrategyInstance();
 
   await strat.authenticate(invalidReq);
@@ -95,7 +121,7 @@ test('#08: Handles exceptions from Magic Admin SDK during token validation', asy
   t.is(failStub.args[0][1], 401);
 });
 
-test('#09: Handles generic exceptions during token validation', async t => {
+test('#10: Handles generic exceptions during token validation', async t => {
   const { strat, verifyStub, failStub } = createStrategyInstance();
 
   (strat as any).magicInstance.token.validate = sinon.spy(() => {

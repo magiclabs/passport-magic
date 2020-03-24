@@ -11,6 +11,7 @@ test('#01: Initialize `MagicStrategy`', t => {
   t.is(strat.name, 'magic');
   t.is((strat as any).verify, verify);
   t.is((strat as any).verifyWithReq, verify);
+  t.is((strat as any).attachmentAttribute, 'attachment');
   t.true((strat as any).magicInstance instanceof Magic);
   t.false((strat as any).passReqToCallback);
 });
@@ -22,7 +23,14 @@ test('#02: Initialize `MagicStrategy` with custom Magic Admin SDK instance', t =
   t.is((strat as any).magicInstance, customMagicInst);
 });
 
-test('#03: Fail to initialize `MagicStrategy` without a `verify` callback', t => {
+test('#03: Initialize `MagicStrategy` with custom attachment attribute name', t => {
+  const customMagicInst = new Magic('API_KEY');
+  const strat = new Strategy({ attachmentAttribute: 'foobar' }, () => {});
+
+  t.is((strat as any).attachmentAttribute, 'foobar');
+});
+
+test('#04: Fail to initialize `MagicStrategy` without a `verify` callback', t => {
   // Given `undefined` as only argument.
   t.throws(() => new Strategy(undefined), {
     instanceOf: TypeError,
@@ -42,7 +50,7 @@ test('#03: Fail to initialize `MagicStrategy` without a `verify` callback', t =>
   });
 });
 
-test('#04: Arguments can be provided in any order', t => {
+test('#05: Arguments can be provided in any order', t => {
   const verify = () => {};
   const options = { passReqToCallback: true } as const;
 
