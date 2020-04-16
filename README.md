@@ -1,6 +1,6 @@
 # Magic Authentication For Passport JS
 
-Integrate [Magic](https://magic.link) passwordless authentication with your Passport.js application.
+> Integrate [Magic](https://magic.link) passwordless authentication with your Passport.js application.
 
 <p align="center">
   <a href="./LICENSE">License</a> ·
