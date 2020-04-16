@@ -14,7 +14,7 @@ See the [developer documentation](https://docs.magic.link/tutorials/full-stack-n
 
 ## 🔗 Installation
 
-Integrating your Node.js application with Magic will require our server-side NPM package:
+Integrating your Passport.js application with Magic will require our server-side NPM package:
 
 ```bash
 # Via NPM:
