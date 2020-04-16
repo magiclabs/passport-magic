@@ -1,13 +1,46 @@
 # Magic Authentication For Passport JS
 
-## Documentation
+Integrate [Magic](https://magic.link) passwordless authentication with your Passport.js application.
 
-See the [Developer Documentation](https://docs.magic.link).
+<p align="center">
+  <a href="./LICENSE">License</a> ·
+  <a href="./CHANGELOG.md">Changelog</a> ·
+  <a href="./CONTRIBUTING.md">Contributing Guide</a>
+</p>
 
-## Installation
+## 📖 Documentation
 
-Integrating your NodeJS application with Magic Authentication will require our NPM package:
+See the [developer documentation](https://docs.magic.link/tutorials/full-stack-node-js) to learn how you can integrate Magic into your Passport.js application in a matter of minutes.
 
-```zsh
+## 🔗 Installation
+
+Integrating your Node.js application with Magic will require our server-side NPM package:
+
+```bash
+# Via NPM:
 npm install --save passport-magic
+
+# Via Yarn:
+yarn add passport-magic
+```
+
+## ⚡️ Quick Start
+
+```ts
+const passport = require("passport");
+const MagicStrategy = require("passport-magic").Strategy;
+
+const strategy = new MagicStrategy(async function(user, done) {
+  const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+  const existingUser = await users.findOne({ issuer: user.issuer });
+  if (!existingUser) {
+    /* Create new user if doesn't exist */
+    return signup(user, userMetadata, done);
+  } else {
+    /* Login user if otherwise */
+    return login(user, done);
+  }
+});
+
+passport.use(strategy);
 ```
