@@ -181,10 +181,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@magic-sdk/admin@^0.1.0-beta.8":
-  version "0.1.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-0.1.0-beta.8.tgz#29c2f8cd82d47626cc490dc31ab70f544f0dd9f4"
-  integrity sha512-X86pmPO5ORk9pvKBis1HerZFFLUZFdmTOyAv0+1mT3XNDy486gmMY2HQpatWM+LRZkoFgLWzCJQ8Ao2am658aw==
+"@magic-sdk/admin@^1.0.0":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/admin/-/admin-1.2.2.tgz#941897f2b53d277f13282649b0c30cbd1020fd08"
+  integrity sha512-cbSxfDp74U3vI4L2k8V8bRChrVWmB4XjclXg/cIEN3bJvBJnXmHn39aGEBXB8LeLpf14g5F5w5zMimG/JehKMg==
   dependencies:
     eth-sig-util "2.1.2"
     ethereumjs-util "^6.2.0"
