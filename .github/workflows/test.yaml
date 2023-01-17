@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-20.04
     name: Run linter and package audit
     container:
-      image: node:16-slim
+      image: node:16
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3'
+          python-version: '3.10'
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -40,13 +40,13 @@ jobs:
     runs-on: ubuntu-20.04
     name: Run tests
     container:
-      image: node:16-slim
+      image: node:16
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3'
+          python-version: '3.10'
 
       - name: Setup node
         uses: actions/setup-node@v3
