@@ -17,6 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-python@v4
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -39,6 +41,8 @@ jobs:
       image: node:16-slim
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
