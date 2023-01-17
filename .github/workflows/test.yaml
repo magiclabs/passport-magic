@@ -28,6 +28,7 @@ jobs:
           cache: 'yarn'
       - run: |
           yarn -v
+          python -V
           yarn
 
       - name: Lint
@@ -55,6 +56,7 @@ jobs:
           cache: 'yarn'
       - run: |
           yarn -v
+          python -V
           yarn
 
       - name: Test
