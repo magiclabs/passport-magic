@@ -1,6 +1,6 @@
 # Magic Authentication For Passport JS
 
-[![MagicLabs](https://circleci.com/gh/magiclabs/passport-magic.svg?style=shield)](https://circleci.com/gh/magiclabs/passport-magic)
+[![Tests](https://github.com/magiclabs/passport-magic/actions/workflows/test.yaml/badge.svg)](https://github.com/magiclabs/passport-magic/actions/workflows/test.yaml)
 
 > Integrate [Magic](https://magic.link) passwordless authentication with your Passport.js application.
 
