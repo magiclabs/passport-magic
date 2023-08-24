@@ -54,7 +54,7 @@
   "dependencies": {
     "@magic-sdk/admin": "^1.0.0",
     "express": "^4.17.1",
-    "passport": "^0.4.1",
+    "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "passport-strategy": "^1.0.0"
   },
